@@ -59,3 +59,26 @@ velocities = np.array([[1, 0], [2, 0], [2, 1], [1, 1]])  # Example velocities at
 strain_rate = calculate_strain_rate(velocities)
 print("Strain rate:")
 print(strain_rate)
+
+
+#LETS DEFINE AN INTEGRATOR
+#ver la que al ppio aumentaba 0.5
+
+# Leapfrog explicit integration to calculate strain from strain rates and stresses
+def leapfrog_integration(strain_rate, stresses, dt):
+    strain = np.zeros_like(strain_rate)
+    strain_prev = np.zeros_like(strain_rate)
+    strain_next = np.zeros_like(strain_rate)
+    num_steps = 10  # Number of integration steps
+    for i in range(num_steps):
+        strain_next = strain_prev + 0.5 * dt * (3 * strain_rate - strain_prev)
+        stresses_next = np.dot(material_matrix(), strain_next)
+        strain = strain_prev + 0.5 * dt * (stresses + stresses_next)
+        strain_prev = strain_next
+        stresses = stresses_next
+    return strain
+
+
+
+
+

@@ -4,6 +4,7 @@
 format: jb-book
 root: intro
 chapters:
-- file: markdown
-- file: notebooks
-- file: markdown-notebooks
+- file: contents/fem_quad
+#- file: markdown
+#- file: notebooks
+#- file: markdown-notebooks

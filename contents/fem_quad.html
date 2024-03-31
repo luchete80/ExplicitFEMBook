@@ -459,16 +459,13 @@ J_{IK} = \frac{\partial x}{\partial(rs)} = \frac{\partial N_i}{\partial\eta_K} X
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Finite element strain rate calculation</span>
-<span class="k">def</span> <span class="nf">calculate_jacobian</span><span class="p">(</span><span class="n">velocities</span><span class="p">):</span>
-    <span class="n">strain_rate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">calculate_jacobian</span><span class="p">(</span><span class="n">pos</span><span class="p">):</span>
     <span class="n">J</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">gp_count</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gauss_points</span><span class="p">)):</span>
         <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">gauss_points</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span>
         <span class="n">weight</span> <span class="o">=</span> <span class="n">gauss_weights</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span>
-        <span class="n">xi</span> <span class="o">=</span> <span class="n">gauss_points</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">eta</span> <span class="o">=</span> <span class="n">gauss_points</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">N</span><span class="p">,</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape_functions</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
-        <span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">],</span> <span class="n">velocities</span><span class="p">)</span>
+        <span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">],</span> <span class="n">pos</span><span class="p">)</span>
         <span class="n">detJ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">])</span>
         <span class="n">invJ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">J</span>
@@ -484,21 +481,34 @@ J_{IK} = \frac{\partial x}{\partial(rs)} = \frac{\partial N_i}{\partial\eta_K} X
 <span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>  <span class="c1"># Example velocities at nodes</span>
 <span class="c1">#strain_rate = calculate_strain_rate(velocities)</span>
 <span class="n">J</span> <span class="o">=</span> <span class="n">calculate_jacobian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Jacobian</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strain rate:&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">strain_rate</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Strain rate:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Jacobian
+ [[[ 2.88675135e-02  1.07345062e-19]
+  [ 2.88675135e-02  5.00000000e-02]]
+
+ [[ 2.88675135e-02  1.07345062e-19]
+  [-2.88675135e-02  5.00000000e-02]]
+
+ [[-2.88675135e-02  5.86544328e-19]
+  [-2.88675135e-02  5.00000000e-02]]
+
+ [[-2.88675135e-02  5.86544328e-19]
+  [ 2.88675135e-02  5.00000000e-02]]]
+Strain rate:
 </pre></div>
 </div>
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">7</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">J</span> <span class="o">=</span> <span class="n">calculate_jacobian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strain rate:&quot;</span><span class="p">)</span>
-<span class="ne">----&gt; </span><span class="mi">7</span> <span class="nb">print</span><span class="p">(</span><span class="n">strain_rate</span><span class="p">)</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">8</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Jacobian</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strain rate:&quot;</span><span class="p">)</span>
+<span class="ne">----&gt; </span><span class="mi">8</span> <span class="nb">print</span><span class="p">(</span><span class="n">strain_rate</span><span class="p">)</span>
 
 <span class="ne">NameError</span>: name &#39;strain_rate&#39; is not defined
 </pre></div>

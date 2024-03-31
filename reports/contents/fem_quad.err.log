@@ -19,7 +19,7 @@ Traceback (most recent call last):
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
 # Example usage
-x    =  np.array([[0., 0.], [0.1, 0.], [0., 0.1], [0.1, 0.1]])
+x    =  np.array([[0., 0.], [0.1, 0.], [0.1, 0.1], [0., 0.1]])
 velocities = np.array([[1, 0], [2, 0], [2, 1], [1, 1]])  # Example velocities at nodes
 #strain_rate = calculate_strain_rate(velocities)
 J = calculate_jacobian(x)
@@ -30,17 +30,17 @@ print(strain_rate)
 
 ----- stdout -----
 Jacobian
- [[[ 2.88675135e-02  1.07345062e-19]
-  [ 2.88675135e-02  5.00000000e-02]]
+ [[[ 5.00000000e-02  1.07345062e-19]
+  [-1.07345062e-19  5.00000000e-02]]
 
- [[ 2.88675135e-02  1.07345062e-19]
-  [-2.88675135e-02  5.00000000e-02]]
+ [[ 5.00000000e-02  1.07345062e-19]
+  [-5.86544328e-19  5.00000000e-02]]
 
- [[-2.88675135e-02  5.86544328e-19]
-  [-2.88675135e-02  5.00000000e-02]]
+ [[ 5.00000000e-02  5.86544328e-19]
+  [-5.86544328e-19  5.00000000e-02]]
 
- [[-2.88675135e-02  5.86544328e-19]
-  [ 2.88675135e-02  5.00000000e-02]]]
+ [[ 5.00000000e-02  5.86544328e-19]
+  [-1.07345062e-19  5.00000000e-02]]]
 Strain rate:
 ------------------
 

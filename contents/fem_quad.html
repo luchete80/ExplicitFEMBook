@@ -415,6 +415,7 @@ J_{IK} = \frac{\partial x}{\partial(rs)} = \frac{\partial N_i}{\partial\eta_K} X
 <span class="n">m_gp_count</span> <span class="o">=</span> <span class="mi">4</span>
 
 <span class="n">dNdX</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_gp_count</span><span class="p">,</span> <span class="n">m_dim</span><span class="p">,</span> <span class="n">m_nodxelem</span><span class="p">))</span> 
+<span class="n">dNdrs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_gp_count</span><span class="p">,</span> <span class="n">m_dim</span><span class="p">,</span> <span class="n">m_nodxelem</span><span class="p">))</span> 
 <span class="c1"># Define shape functions and their derivatives for 2D quadrilateral element</span>
 <span class="k">def</span> <span class="nf">shape_functions</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
     <span class="n">dNdX_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_dim</span><span class="p">,</span> <span class="n">m_nodxelem</span><span class="p">))</span>
@@ -451,7 +452,7 @@ J_{IK} = \frac{\partial x}{\partial(rs)} = \frac{\partial N_i}{\partial\eta_K} X
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gauss_points</span><span class="p">)):</span>
     <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">gauss_points</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span>
-    <span class="n">N</span><span class="p">,</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape_functions</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+    <span class="n">N</span><span class="p">,</span> <span class="n">dNdrs</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape_functions</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -464,10 +465,13 @@ J_{IK} = \frac{\partial x}{\partial(rs)} = \frac{\partial N_i}{\partial\eta_K} X
     <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gauss_points</span><span class="p">)):</span>
         <span class="n">xi</span><span class="p">,</span> <span class="n">eta</span> <span class="o">=</span> <span class="n">gauss_points</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span>
         <span class="n">weight</span> <span class="o">=</span> <span class="n">gauss_weights</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span>
-        <span class="n">N</span><span class="p">,</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape_functions</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
-        <span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">],</span> <span class="n">pos</span><span class="p">)</span>
+        <span class="n">N</span><span class="p">,</span> <span class="n">dNdrs</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">shape_functions</span><span class="p">(</span><span class="n">xi</span><span class="p">,</span> <span class="n">eta</span><span class="p">)</span>
+        <span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">dNdrs</span><span class="p">[</span><span class="n">gp</span><span class="p">],</span> <span class="n">pos</span><span class="p">)</span>
         <span class="n">detJ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;det J</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">detJ</span><span class="p">)</span>
         <span class="n">invJ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">])</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;invJ&quot;</span><span class="p">,</span> <span class="n">invJ</span><span class="p">)</span>
+        <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">invJ</span><span class="p">,</span><span class="n">dNdrs</span><span class="p">[</span><span class="n">gp</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">J</span>
 </pre></div>
 </div>
@@ -478,39 +482,33 @@ J_{IK} = \frac{\partial x}{\partial(rs)} = \frac{\partial N_i}{\partial\eta_K} X
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example usage</span>
 <span class="n">x</span>    <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]])</span>
-<span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>  <span class="c1"># Example velocities at nodes</span>
+<span class="n">velocities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>  <span class="c1"># Example velocities at nodes</span>
 <span class="c1">#strain_rate = calculate_strain_rate(velocities)</span>
 <span class="n">J</span> <span class="o">=</span> <span class="n">calculate_jacobian</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Jacobian</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strain rate:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">strain_rate</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Jacobian</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">J</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Jacobian
- [[[ 5.00000000e-02  1.07345062e-19]
-  [-1.07345062e-19  5.00000000e-02]]
-
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>det J
+ 0.0025000000000000005
+invJ [[ 2.00000000e+01 -4.29380248e-17]
+ [ 4.29380248e-17  2.00000000e+01]]
+det J
+ 0.0025000000000000005
+invJ [[ 2.00000000e+01 -4.29380248e-17]
+ [ 2.34617731e-16  2.00000000e+01]]
+det J
+ 0.0025000000000000005
+invJ [[ 2.00000000e+01 -2.34617731e-16]
+ [ 2.34617731e-16  2.00000000e+01]]
+det J
+ 0.0025000000000000005
+invJ [[ 2.00000000e+01 -2.34617731e-16]
+ [ 4.29380248e-17  2.00000000e+01]]
+Jacobian
  [[ 5.00000000e-02  1.07345062e-19]
-  [-5.86544328e-19  5.00000000e-02]]
-
- [[ 5.00000000e-02  5.86544328e-19]
-  [-5.86544328e-19  5.00000000e-02]]
-
- [[ 5.00000000e-02  5.86544328e-19]
-  [-1.07345062e-19  5.00000000e-02]]]
-Strain rate:
-</pre></div>
-</div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">8</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Jacobian</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Strain rate:&quot;</span><span class="p">)</span>
-<span class="ne">----&gt; </span><span class="mi">8</span> <span class="nb">print</span><span class="p">(</span><span class="n">strain_rate</span><span class="p">)</span>
-
-<span class="ne">NameError</span>: name &#39;strain_rate&#39; is not defined
+ [-1.07345062e-19  5.00000000e-02]]
 </pre></div>
 </div>
 </div>
@@ -525,7 +523,7 @@ Strain rate:
 <p>Due shape function gradients are calculated as gauss points,
 We can express this as <br>
 <span class="math notranslate nohighlight">\( 
-\nabla v_{IJ}  = \frac{dN_k}{dX_J} X_{kI} 
+\nabla v_{IJ}  = \frac{dN_k}{dX_J} V_{kI} 
 \)</span>
 <br>
 This means that, for each dimension,</p>
@@ -541,7 +539,8 @@ This means that, for each dimension,</p>
         <span class="k">for</span> <span class="n">I</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m_dim</span><span class="p">):</span> 
             <span class="k">for</span> <span class="n">J</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m_dim</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m_nodxelem</span><span class="p">):</span> 
-                    <span class="n">grad_v</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">vel</span><span class="p">[</span><span class="n">k</span> <span class="o">*</span> <span class="n">m_dim</span> <span class="o">+</span> <span class="n">I</span><span class="p">]</span>
+                    <span class="c1">#grad_v[gp,I, J] += dNdX[gp, J, k] * vel[k * m_dim + I]</span>
+                    <span class="n">grad_v</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">]</span> <span class="o">+=</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">vel</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">I</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">grad_v</span>
 </pre></div>
 </div>
@@ -549,38 +548,19 @@ This means that, for each dimension,</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grad_v</span> <span class="o">=</span> <span class="n">velocity_gradient_tensor</span><span class="p">(</span><span class="n">dNdX</span><span class="p">,</span> <span class="n">vel</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Velocity gradients</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="n">grad_v</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m_gp_count</span><span class="p">):</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strain rate:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">grad_v</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span><span class="o">+</span><span class="n">grad_v</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grad_v</span> <span class="o">=</span> <span class="n">velocity_gradient_tensor</span><span class="p">(</span><span class="n">dNdX</span><span class="p">,</span> <span class="n">velocities</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Velocity gradients</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="n">grad_v</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strain rate:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">grad_v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">grad_v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Velocity gradients
- [[[ 0.00000000e+00  0.00000000e+00]
-  [ 0.00000000e+00 -5.50000000e-01]]
-
- [[ 0.00000000e+00  3.46944695e-18]
-  [ 0.00000000e+00 -5.50000000e-01]]
-
- [[ 0.00000000e+00  3.46944695e-18]
-  [ 0.00000000e+00 -5.50000000e-01]]
-
- [[ 0.00000000e+00  0.00000000e+00]
-  [ 0.00000000e+00 -5.50000000e-01]]]
+ [[  0.   0.]
+ [  0. -10.]]
 strain rate:
- [[ 0.    0.  ]
- [ 0.   -0.55]]
-strain rate:
- [[ 0.00000000e+00  1.73472348e-18]
- [ 1.73472348e-18 -5.50000000e-01]]
-strain rate:
- [[ 0.00000000e+00  1.73472348e-18]
- [ 1.73472348e-18 -5.50000000e-01]]
-strain rate:
- [[ 0.    0.  ]
- [ 0.   -0.55]]
+ [[  0.   0.]
+ [  0. -10.]]
 </pre></div>
 </div>
 </div>

@@ -518,6 +518,17 @@ Strain rate:
 <section id="velocity-gradient-and-strain-rate">
 <h2>Velocity Gradient and Strain Rate<a class="headerlink" href="#velocity-gradient-and-strain-rate" title="Link to this heading">#</a></h2>
 <p>Velocity gradient tensor is defined as:</p>
+<div class="math notranslate nohighlight">
+\[
+\nabla v = \frac{dv_I}{dx_J}
+\]</div>
+<p>Due shape function gradients are calculated as gauss points,
+We can express this as <br>
+<span class="math notranslate nohighlight">\( 
+\nabla v_{IJ}  = \frac{dN_k}{dX_J} X_{kI} 
+\)</span>
+<br>
+This means that, for each dimension,</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define nodal velocities (dummy data for demonstration)</span>

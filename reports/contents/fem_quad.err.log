@@ -18,38 +18,53 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-# Example usage
-x    =  np.array([[0., 0.], [0.1, 0.], [0.1, 0.1], [0., 0.1]])
-velocities = np.array([[1, 0], [2, 0], [2, 1], [1, 1]])  # Example velocities at nodes
-#strain_rate = calculate_strain_rate(velocities)
-J = calculate_jacobian(x)
-print ("Jacobian\n", J)
-print("Strain rate:")
-print(strain_rate)
+
+def calc_str_rate (dNdX,velocities):
+    str_rate = np.zeros((m_gp_count,m_dim, m_dim))
+    for gp in range (m_gp_count):
+        grad_v = velocity_gradient_tensor(dNdX, velocities)
+        print("Velocity gradients\n" ,grad_v[0])
+
+        str_rate[gp] = 0.5*(grad_v[0]+grad_v[0].T)
+    print("strain rate:\n" ,str_rate)
+
+calc_str_rate (dNdX,velocities)
+print("strain rate:\n" ,str_rate[0])
 ------------------
 
 ----- stdout -----
-Jacobian
- [[[ 5.00000000e-02  1.07345062e-19]
-  [-1.07345062e-19  5.00000000e-02]]
+Velocity gradients
+ [[  0.   0.]
+ [  0. -10.]]
+Velocity gradients
+ [[  0.   0.]
+ [  0. -10.]]
+Velocity gradients
+ [[  0.   0.]
+ [  0. -10.]]
+Velocity gradients
+ [[  0.   0.]
+ [  0. -10.]]
+strain rate:
+ [[[  0.   0.]
+  [  0. -10.]]
 
- [[ 5.00000000e-02  1.07345062e-19]
-  [-5.86544328e-19  5.00000000e-02]]
+ [[  0.   0.]
+  [  0. -10.]]
 
- [[ 5.00000000e-02  5.86544328e-19]
-  [-5.86544328e-19  5.00000000e-02]]
+ [[  0.   0.]
+  [  0. -10.]]
 
- [[ 5.00000000e-02  5.86544328e-19]
-  [-1.07345062e-19  5.00000000e-02]]]
-Strain rate:
+ [[  0.   0.]
+  [  0. -10.]]]
 ------------------
 
 [1;31m---------------------------------------------------------------------------[0m
 [1;31mNameError[0m                                 Traceback (most recent call last)
-Cell [1;32mIn[5], line 8[0m
-[0;32m      6[0m [38;5;28mprint[39m ([38;5;124m"[39m[38;5;124mJacobian[39m[38;5;130;01m\n[39;00m[38;5;124m"[39m, J)
-[0;32m      7[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mStrain rate:[39m[38;5;124m"[39m)
-[1;32m----> 8[0m [38;5;28mprint[39m([43mstrain_rate[49m)
+Cell [1;32mIn[7], line 11[0m
+[0;32m      8[0m     [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mstrain rate:[39m[38;5;130;01m\n[39;00m[38;5;124m"[39m ,str_rate)
+[0;32m     10[0m calc_str_rate (dNdX,velocities)
+[1;32m---> 11[0m [38;5;28mprint[39m([38;5;124m"[39m[38;5;124mstrain rate:[39m[38;5;130;01m\n[39;00m[38;5;124m"[39m ,[43mstr_rate[49m[[38;5;241m0[39m])
 
-[1;31mNameError[0m: name 'strain_rate' is not defined
+[1;31mNameError[0m: name 'str_rate' is not defined
 

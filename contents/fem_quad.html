@@ -388,12 +388,12 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="jacobian">
 <h1>Jacobian<a class="headerlink" href="#jacobian" title="Link to this heading">#</a></h1>
-<p>Lets begin with some definitions</p>
+<p>Lets begin with some definitions. Jacobian matrix represents deformation of an element from its intrinsic coordinates</p>
 <div class="math notranslate nohighlight">
 \[
-J_{IK} = \frac{\partial x}{\partial(rs)} = \frac{\partial N_i}{\partial\eta_K} X_{iI}
+J_{IK} = \frac{\partial x}{{\partial\eta_K}} = \frac{\partial N_i}{{\partial\eta_K}} X_{iI}
 \]</div>
-<p>being <span class="math notranslate nohighlight">\(X_iI\)</span> the nodal coordinates in the <span class="math notranslate nohighlight">\(I\)</span> dimension, the current position and X the reference position, with <span class="math notranslate nohighlight">\(i\)</span> in sum</p>
+<p>being <span class="math notranslate nohighlight">\(X_{iI}\)</span> the nodal coordinates in the <span class="math notranslate nohighlight">\(I\)</span> dimension, the current position and X the reference position, with <span class="math notranslate nohighlight">\(i\)</span> in sum</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -549,8 +549,8 @@ This means that, for each dimension,</p>
 
         <span class="n">str_rate</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">grad_v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">grad_v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strain rate:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="n">str_rate</span><span class="p">)</span>
-
-<span class="n">calc_str_rate</span> <span class="p">(</span><span class="n">dNdX</span><span class="p">,</span><span class="n">velocities</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">str_rate</span>
+<span class="n">str_rate</span> <span class="o">=</span> <span class="n">calc_str_rate</span> <span class="p">(</span><span class="n">dNdX</span><span class="p">,</span><span class="n">velocities</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strain rate:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="n">str_rate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -580,16 +580,9 @@ strain rate:
 
  [[  0.   0.]
   [  0. -10.]]]
-</pre></div>
-</div>
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">NameError</span><span class="g g-Whitespace">                                 </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">11</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strain rate:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="n">str_rate</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">calc_str_rate</span> <span class="p">(</span><span class="n">dNdX</span><span class="p">,</span><span class="n">velocities</span><span class="p">)</span>
-<span class="ne">---&gt; </span><span class="mi">11</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;strain rate:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="p">,</span><span class="n">str_rate</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-
-<span class="ne">NameError</span>: name &#39;str_rate&#39; is not defined
+strain rate:
+ [[  0.   0.]
+ [  0. -10.]]
 </pre></div>
 </div>
 </div>
@@ -611,7 +604,123 @@ In any case, we have to compute the incremental displacements from strain rate</
                                      <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nu</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]])</span>
     <span class="k">return</span> <span class="n">C</span>
 
-<span class="c1"># Finite element strain rate calculation</span>
+<span class="k">def</span> <span class="nf">calculate_strain</span><span class="p">(</span><span class="n">str_rate</span><span class="p">,</span><span class="n">dt</span><span class="p">):</span>
+    <span class="n">strain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_gp_count</span><span class="p">,</span><span class="n">m_dim</span><span class="p">,</span> <span class="n">m_dim</span><span class="p">))</span>
+    <span class="n">strain</span> <span class="o">=</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">str_rate</span>
+    <span class="k">return</span> <span class="n">strain</span>
+    
+<span class="k">def</span> <span class="nf">calculate_stress</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span><span class="n">dNdX</span><span class="p">):</span>
+    <span class="n">stress</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_gp_count</span><span class="p">,</span><span class="n">m_dim</span><span class="p">,</span> <span class="n">m_dim</span><span class="p">))</span>
+    <span class="c1"># strain = np.zeros((m_gp_count,m_dim, m_dim))</span>
+    <span class="c1"># eps[gp] +=  str_rate * dt</span>
+  <span class="c1"># # PLAIN STRESS</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">-</span> <span class="n">nu</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span>
+  
+  <span class="c1"># #!!!! PLAIN STRAIN</span>
+  <span class="c1"># #c = dom%mat_E / ((1.0+dom%mat_nu)*(1.0-2.0*dom%mat_nu))</span>
+    <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gauss_points</span><span class="p">)):</span>
+        <span class="n">stress</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span><span class="o">-</span><span class="n">nu</span><span class="p">)</span><span class="o">*</span><span class="n">eps</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">nu</span><span class="o">*</span><span class="n">eps</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">stress</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="p">((</span><span class="mf">1.0</span><span class="o">-</span><span class="n">nu</span><span class="p">)</span><span class="o">*</span><span class="n">eps</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">nu</span><span class="o">*</span><span class="n">eps</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">stress</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">stress</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">nu</span><span class="p">)</span><span class="o">*</span><span class="n">eps</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> 
+    <span class="k">return</span> <span class="n">stress</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[[ 0.      0.    ]
+  [ 0.     -0.0008]]
+
+ [[ 0.      0.    ]
+  [ 0.     -0.0008]]
+
+ [[ 0.      0.    ]
+  [ 0.     -0.0008]]
+
+ [[ 0.      0.    ]
+  [ 0.     -0.0008]]]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">strain</span> <span class="o">=</span>  <span class="n">calculate_strain</span><span class="p">(</span><span class="n">str_rate</span><span class="p">,</span><span class="n">dt</span><span class="p">)</span>
+<span class="n">stress</span> <span class="o">=</span>  <span class="n">calculate_stress</span><span class="p">(</span><span class="n">strain</span><span class="p">,</span><span class="n">dt</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;strain &quot;</span><span class="p">,</span><span class="n">strain</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;stress&quot;</span><span class="p">,</span> <span class="n">stress</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>strain  [[[ 0.      0.    ]
+  [ 0.     -0.0008]]
+
+ [[ 0.      0.    ]
+  [ 0.     -0.0008]]
+
+ [[ 0.      0.    ]
+  [ 0.     -0.0008]]
+
+ [[ 0.      0.    ]
+  [ 0.     -0.0008]]]
+stress [[[-52747252.74725275         0.        ]
+  [        0.         -52747252.74725275]]
+
+ [[-52747252.74725275         0.        ]
+  [        0.         -52747252.74725275]]
+
+ [[-52747252.74725275         0.        ]
+  [        0.         -52747252.74725275]]
+
+ [[-52747252.74725275         0.        ]
+  [        0.         -52747252.74725275]]]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Finite element strain rate calculation</span>
+<span class="c1">#We can calculate with B matrix</span>
+<span class="c1">#F = BT x sigma = [dh1/dx dh1/dy ] x [ sxx sxy]</span>
+<span class="c1">#               = [dh2/dx dh2/dy ]   [ syx syy]</span>
+<span class="k">def</span> <span class="nf">calc_forces</span><span class="p">(</span><span class="n">stress</span><span class="p">,</span><span class="n">dNdX</span><span class="p">,</span><span class="n">J</span><span class="p">):</span>
+    <span class="n">forces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_nodxelem</span><span class="p">,</span><span class="n">m_dim</span><span class="p">))</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_dim</span><span class="p">,</span> <span class="n">m_nodxelem</span><span class="p">))</span>
+    
+    <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gauss_points</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m_nodxelem</span><span class="p">):</span>
+            <span class="n">B</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">B</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">forces</span> <span class="o">+=</span>  <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">stress</span><span class="p">[</span><span class="n">gp</span><span class="p">])</span> <span class="o">*</span>  <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">J</span><span class="p">[</span><span class="n">gp</span><span class="p">])</span> <span class="o">*</span> <span class="n">gauss_weights</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span>
+        <span class="c1">#print(forces)</span>
+    <span class="k">return</span> <span class="n">forces</span> 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">forces</span> <span class="o">=</span> <span class="n">calc_forces</span><span class="p">(</span><span class="n">stress</span><span class="p">,</span><span class="n">dNdX</span><span class="p">,</span><span class="n">J</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="n">forces</span><span class="p">)</span>
+    
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 2637362.63736264  2637362.63736264]
+ [-2637362.63736264  2637362.63736264]
+ [-2637362.63736264 -2637362.63736264]
+ [ 2637362.63736264 -2637362.63736264]]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note that these are the internal forces</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Finite element strain rate calculation</span>
+<span class="c1">#We can calculate with B matrix</span>
 <span class="k">def</span> <span class="nf">calculate_stress</span><span class="p">(</span><span class="n">str_rate</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="n">dNdX</span><span class="p">):</span>
     <span class="n">stress</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">m_gp_count</span><span class="p">,</span><span class="n">m_dim</span><span class="p">,</span> <span class="n">m_dim</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">gp</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gauss_points</span><span class="p">)):</span>
@@ -626,39 +735,6 @@ In any case, we have to compute the incremental displacements from strain rate</
         <span class="c1">#strain_rate += np.dot(B.T, np.dot(invJ.T, np.dot(B, C))) * detJ * weight</span>
         <span class="c1">#print (&quot;Jacobian&quot;, J[gp])</span>
     <span class="k">return</span> <span class="n">stress</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[ 0.      0.    ]
- [ 0.     -0.0008]]
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stress</span> <span class="o">=</span>  <span class="n">calculate_stress</span><span class="p">(</span><span class="n">str_rate</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="n">dNdX</span><span class="p">)</span>
-<span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;stress &quot;</span><span class="p">,</span><span class="n">stress</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">ValueError</span><span class="g g-Whitespace">                                </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">48</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">stress</span> <span class="o">=</span>  <span class="n">calculate_stress</span><span class="p">(</span><span class="n">str_rate</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="n">dNdX</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;stress &quot;</span><span class="p">,</span><span class="n">stress</span><span class="p">)</span>
-
-<span class="nn">Cell In[47], line 24,</span> in <span class="ni">calculate_stress</span><span class="nt">(str_rate, dt, dNdX)</span>
-<span class="g g-Whitespace">     </span><span class="mi">22</span>         <span class="n">B</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dNdX</span><span class="p">[</span><span class="n">gp</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span>     <span class="n">C</span> <span class="o">=</span> <span class="n">material_matrix</span><span class="p">()</span>
-<span class="ne">---&gt; </span><span class="mi">24</span>     <span class="n">stress</span><span class="p">[</span><span class="n">gp</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">C</span><span class="p">,</span><span class="n">B</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">25</span>     <span class="c1">#strain_rate += np.dot(B.T, np.dot(invJ.T, np.dot(B, C))) * detJ * weight</span>
-<span class="g g-Whitespace">     </span><span class="mi">26</span>     <span class="c1">#print (&quot;Jacobian&quot;, J[gp])</span>
-<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="k">return</span> <span class="n">stress</span>
-
-<span class="ne">ValueError</span>: could not broadcast input array from shape (3,8) into shape (2,2)
 </pre></div>
 </div>
 </div>
